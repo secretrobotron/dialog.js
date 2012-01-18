@@ -5,6 +5,24 @@
     <script type="text/javascript">
       (function(){
         var comm = new Comm();
+
+        document.addEventListener( "DOMContentLoaded", function( e ){
+          var okButton = document.getElementById( "ok" ),
+              cancelButton = document.getElementById( "cancel" );
+
+          okButton.addEventListener( "click", function( e ){
+            comm.send( "submit", {
+              test: 2
+            });
+            comm.send( "close" );
+          }, false );
+
+          cancelButton.addEventListener( "click", function( e ){
+            comm.send( "cancel" );
+          }, false );
+
+        }, false );
+        
       })();
     </script>
   </head>

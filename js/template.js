@@ -1,9 +1,10 @@
-define( [ "./util" ], function( util ){
+define( [ "./util", "./template-instance" ], function( util, TemplateInstance ){
 
   var Template = function( element, options ) {
     options = options || {};
 
     var _element = element,
+        _contentElement,
         _name = options.name || element.id,
         _this = this;
 
@@ -13,8 +14,8 @@ define( [ "./util" ], function( util ){
 
     _element.parentNode.removeChild( _element );
 
-    this.clone = function(){
-      return _element.cloneNode( true );
+    this.createInstance = function( content ){
+      return new TemplateInstance( _element );
     }; //clone
 
     Object.defineProperties( this, {

@@ -14,28 +14,50 @@ define( [ "./util", "./base-dialog", "./comm" ], function( util, BaseDialog, Com
         _currentBackground,
         _currentTemplate;
 
+    function onSubmit(){
+      console.log("submit");
+    } //onSubmit
+
+    function onCancel(){
+      close();
+    } //onCancel
+
+    function onClose(){
+      close();
+    } //onClose
+
+    function close(){
+      _currentComm.unlisten( "submit", onSubmit );
+      _currentComm.unlisten( "cancel", onCancel );
+      _currentComm.unlisten( "close", onClose );
+      _currentTemplate.destroy();
+      _baseDialog.hide();
+    } //close
+
     this.show = function( options, background ){
       var showOptions = _baseDialog.prepareToShow( options ),
           iframe = document.createElement( "iframe" );
-      _currentTemplate = _this.template.clone();
+      _currentTemplate = _this.template.createInstance();
+      _currentTemplate.insertContent( iframe );
       _currentBackground = background;
       iframe.src = _url;
-      _currentTemplate.appendChild( iframe );
-      _currentBackground.appendChild( _currentTemplate );
-      util.css( iframe, "width", util.css( _currentTemplate, "width" ) );
-      util.css( iframe, "height", util.css( _currentTemplate, "height" ) );
+      _currentTemplate.attach( _currentBackground );
+      util.css( iframe, "width", util.css( _currentTemplate.element, "width" ) );
+      util.css( iframe, "height", util.css( _currentTemplate.element, "height" ) );
       util.css( iframe, "border", "none" );
       iframe.addEventListener( "load", function( e ){
         _currentComm = new Comm( iframe.contentWindow, function(){
-          util.css( _currentTemplate, "visibility", "visible" );
+          _currentTemplate.show();
+          _currentComm.listen( "submit", onSubmit );
+          _currentComm.listen( "cancel", onCancel );
+          _currentComm.listen( "close", onClose );
         });
       }, false );
       _baseDialog.show();
     }; //show
 
     this.hide = function(){
-      _baseDialog.hide();
-      _currentBackground.element.removeChild( _currentTemplate );
+      close();
     }; //hide
     
   }; //IFRAMEDialog
