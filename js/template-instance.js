@@ -14,8 +14,6 @@ define( [ "./util" ], function( util ){
       _contentElement = _rootElement;
     } //if
 
-    console.log( _rootElement, _contentElement );
-
     util.addClass( _contentElement, "dialog-content" );
 
     this.insertContent = function( content ){

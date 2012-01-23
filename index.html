@@ -5,16 +5,36 @@
     <script src="js/loader.js"></script>
     <script>
       (function(){
+        function changeValue( val ){
+          document.getElementById( "submit-value" ).innerHTML = val;
+        } //changeValue
+
         document.addEventListener( "DOMContentLoaded", function( e ){
           dialog(function( context ){
-            context.add( "test", {
+            context.add( "test-iframe", {
               type: "iframe",
               modal: true,
               template: "dialog-template",
               url: "test.html"
             });
+            context.add( "test-window", {
+              type: "window",
+              modal: true,
+              url: "test.html"
+            });
             document.getElementById( "iframe-normal-btn" ).addEventListener( "click", function ( e ){
-              context.show( "test" );
+              context.open( "test-iframe",{
+                submit: function( e ){ changeValue( e.data.test ); },
+                cancel: function( e ){ changeValue( "cancelled!" ); },
+                error: function( e ){ changeValue( "error! " + e.data.type + e.data.message ); }
+              });
+            }, false );
+            document.getElementById( "window-normal-btn" ).addEventListener( "click", function ( e ){
+              context.open( "test-window",{
+                submit: function( e ){ changeValue( e.data.test ); },
+                cancel: function( e ){ changeValue( "cancelled!" ); },
+                error: function( e ){ changeValue( "error! " + e.data.type + e.data.message ); }
+              });
             }, false );
           });
         }, false );
@@ -75,50 +95,15 @@
         top: 7px;
         left: 15px;
       }
-      .dialog-template .dialog-header .dialog-close {
-        font: 1em helvetica, sans;
-        text-align: center;
-        position: absolute;
-        right: 10px;
-        top: 5px;
-        width: 1.4em;
-        height: 1.4em;
-        color: #fff;
-        border-radius: 5px;
-        background-image: linear-gradient(bottom, rgb(82,10,15) 36%, rgb(184,27,27) 68%, rgb(191,25,25) 84%);
-        background-image: -o-linear-gradient(bottom, rgb(82,10,15) 36%, rgb(184,27,27) 68%, rgb(191,25,25) 84%);
-        background-image: -moz-linear-gradient(bottom, rgb(82,10,15) 36%, rgb(184,27,27) 68%, rgb(191,25,25) 84%);
-        background-image: -webkit-linear-gradient(bottom, rgb(82,10,15) 36%, rgb(184,27,27) 68%, rgb(191,25,25) 84%);
-        background-image: -ms-linear-gradient(bottom, rgb(82,10,15) 36%, rgb(184,27,27) 68%, rgb(191,25,25) 84%);
-        background-image: -webkit-gradient(
-          linear,
-          left bottom,
-          left top,
-          color-stop(0.36, rgb(82,10,15)),
-          color-stop(0.68, rgb(184,27,27)),
-          color-stop(0.84, rgb(191,25,25))
-        );
-        padding-top: 2px;
-        font-weight: bold;
-        -moz-user-select: none;  
-        -webkit-user-select: none;  
-        -ms-user-select: none; 
-        cursor: pointer;
-      }
     </style>
   </head>
   <body>
-    <!--<input type="button" value="DOM" />-->
     <input id="iframe-normal-btn" type="button" value="IFRAME" />
-    <!--<input type="button" value="XHR" />
-    <input type="button" value="DOM (MODAL)" />
-    <input type="button" value="IFRAME (MODAL)" />
-    <input type="button" value="XHR (MODAL)" />-->
+    <input id="window-normal-btn" type="button" value="WINDOW" />
     <div id="dialog-template" dialog-template>
-      <!--<div class="dialog-header"><span class="dialog-title">Title</span><span class="dialog-close">X</span></div>-->
       <div class="dialog-header"><span class="dialog-title">Dialog</span></div>
       <div dialog-content></div>
     </div>
-    <!--<div id="test-dom-dialog" dialog-content>TEST</div>-->
+    <div>Submit Value:<div id="submit-value"></div>
   </body>
 </html>

@@ -1,6 +1,6 @@
 define( [], function(){
 
-  var BaseDialog = function( context, parentDialog, baseOptions ) {
+  var BaseDialog = function( context, baseOptions, parentDialog ) {
 
     var _this = this,
         _type = baseOptions.type,
@@ -12,20 +12,16 @@ define( [], function(){
       _template = context.getTemplate( _template );
     } //if
 
-    if( !_template ){
-      throw new Error( "Template required to build dialog." );
-    } //if
-
-    this.show = function(){
+    this.open = function(){
       if( _open ){
         throw new Error( "Dialog already open!" );
       } //if
       _open = true;
-    }; //show
+    }; //open
 
-    this.hide = function(){
+    this.close = function(){
       _open = false;
-    }; //hide
+    }; //close
 
     this.prepareToShow = function( options ){
       options = options || {};
@@ -36,28 +32,40 @@ define( [], function(){
       return showOptions;
     }; //prepareToShow
 
-    Object.defineProperties( parentDialog, {
-      type: {
-        get: function() {
-          return _type;
+    this.applyProperties = function( object ){
+      Object.defineProperties( object, {
+        type: {
+          get: function() {
+            return _type;
+          }
+        },
+        template: {
+          get: function() {
+            return _template;
+          }
+        },
+        modal: {
+          get: function(){
+            return _modal;
+          }
+        },
+        isOpen: {
+          get: function(){
+            return _open;
+          }
+        },
+        canOpen: {
+          get: function(){
+            return !_open;
+          }
         }
-      },
-      template: {
-        get: function() {
-          return _template;
-        }
-      },
-      modal: {
-        get: function(){
-          return _modal;
-        }
-      },
-      open: {
-        get: function(){
-          return _open;
-        }
-      }
-    });
+      });
+    }; //applyProperties
+
+    _this.applyProperties( _this );
+    if( parentDialog ){
+      _this.applyProperties( parentDialog );
+    } //if
 
   }; //BaseDialog
 

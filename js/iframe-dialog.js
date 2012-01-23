@@ -1,4 +1,4 @@
-define( [ "./util", "./base-dialog", "./comm" ], function( util, BaseDialog, Comm ){
+define( [ "./util", "./base-dialog", "./comm", "./event-manager" ], function( util, BaseDialog, Comm, EventManager ){
 
   var IFRAMEDialog = function( context, dialogOptions ) {
     dialogOptions = dialogOptions || {};
@@ -8,21 +8,26 @@ define( [ "./util", "./base-dialog", "./comm" ], function( util, BaseDialog, Com
     } //if
 
     var _this = this,
-        _baseDialog = new BaseDialog( context, _this, dialogOptions ),
+        _baseDialog = new BaseDialog( context, dialogOptions, _this ),
         _url = dialogOptions.url,
+        _em = new EventManager( _this ),
         _currentComm,
-        _currentBackground,
         _currentTemplate;
 
-    function onSubmit(){
-      console.log("submit");
+    if( !_this.template ){
+      throw new Error( "Template required to build iframe dialog." );
+    } //if
+
+    function onSubmit( e ){
+      _em.dispatch( e.type, e.data.data );
     } //onSubmit
 
-    function onCancel(){
+    function onCancel( e ){
+      _em.dispatch( e.type, e.data );
       close();
     } //onCancel
 
-    function onClose(){
+    function onClose( e ){
       close();
     } //onClose
 
@@ -30,21 +35,21 @@ define( [ "./util", "./base-dialog", "./comm" ], function( util, BaseDialog, Com
       _currentComm.unlisten( "submit", onSubmit );
       _currentComm.unlisten( "cancel", onCancel );
       _currentComm.unlisten( "close", onClose );
+      _currentComm.destroy();
       _currentTemplate.destroy();
-      _baseDialog.hide();
+      _baseDialog.close();
+      _em.dispatch( "close" );
     } //close
 
-    this.show = function( options, background ){
-      var showOptions = _baseDialog.prepareToShow( options ),
-          iframe = document.createElement( "iframe" );
+    this.open = function( background ){
+      var iframe = document.createElement( "iframe" );
       _currentTemplate = _this.template.createInstance();
       _currentTemplate.insertContent( iframe );
-      _currentBackground = background;
-      iframe.src = _url;
-      _currentTemplate.attach( _currentBackground );
+      _currentTemplate.attach( background );
       util.css( iframe, "width", util.css( _currentTemplate.element, "width" ) );
       util.css( iframe, "height", util.css( _currentTemplate.element, "height" ) );
       util.css( iframe, "border", "none" );
+      iframe.src = _url;
       iframe.addEventListener( "load", function( e ){
         _currentComm = new Comm( iframe.contentWindow, function(){
           _currentTemplate.show();
@@ -53,12 +58,13 @@ define( [ "./util", "./base-dialog", "./comm" ], function( util, BaseDialog, Com
           _currentComm.listen( "close", onClose );
         });
       }, false );
-      _baseDialog.show();
-    }; //show
+      _baseDialog.open();
+      _em.dispatch( "open" );
+    }; //open
 
-    this.hide = function(){
+    this.close = function(){
       close();
-    }; //hide
+    }; //close
     
   }; //IFRAMEDialog
 

@@ -7,7 +7,12 @@ var Comm = function(){
   root.addEventListener( "message", function( e ){
     if( e.source !== root && typeof e.data === "object" ){
       if( !_context || _context === e.data.context ){
-        _this.dispatch( e.data.type, e.data );
+        if( e.data.type === "ping" ){
+          _this.send( "pong" );
+        }
+        else {
+          _this.dispatch( e.data.type, e.data );
+        } //if
       } //if
     } //if
   }, false );

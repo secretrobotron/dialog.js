@@ -12,7 +12,7 @@
 
           okButton.addEventListener( "click", function( e ){
             comm.send( "submit", {
-              test: 2
+              test: "Test submission!"
             });
             comm.send( "close" );
           }, false );
@@ -27,6 +27,7 @@
     </script>
   </head>
   <body>
+    <h1>This is a dialog</h1>
     <input id="ok" type="button" value="Ok" />
     <input id="cancel" type="button" value="Cancel" />
   </body>

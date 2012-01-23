@@ -1,46 +1,23 @@
 define( [
     "./util",
-    "./modal",
+    "./layer-manager",
     "./template",
-    "./dom-dialog",
     "./iframe-dialog",
-    "./xhr-dialog"
-  ], function( util, Modal, Template, DOMDialog, IFRAMEDialog, XHRDialog ){
-
-  const MAX_DIALOGS = 1000;
-  const MIN_Z_INDEX = 2147483647 - MAX_DIALOGS;
+    "./window-dialog"
+  ], function( util, LayerManager, Template, IFRAMEDialog, WindowDialog ){
 
   var Context = function() {
 
     var _dialogs = {},
         _this = this,
+        _layerManager = new LayerManager(),
         _dialogTypes = {
-          "dom": DOMDialog,
           "iframe": IFRAMEDialog,
-          "xhr": XHRDialog
+          "window": WindowDialog
         },
-        _dialogTemplates = [],
-        _dialogContents = [],
-        _currentZIndex = MIN_Z_INDEX;
+        _dialogTemplates = [];
 
-    var _body = window.document.body;
-
-/*
-    var _background = document.createElement( "div" );
-    util.css( _background, "position", "absolute" );
-    util.css( _background, "top", "0px" );
-    util.css( _background, "left", "0px" );
-    util.css( _background, "z-index", MIN_Z_INDEX );
-
-    function onWindowResize( e ){
-      util.css( _background, "width", window.innerWidth + "px" );
-      util.css( _background, "height", window.innerHeight + "px" );
-    } //onWindowResize
-    window.addEventListener( "resize", onWindowResize, false );
-    onWindowResize();
-
-    _body.appendChild( _background );
-*/
+    var _body = document.body;
 
     var innerUtil = {
       getTemplate: function( name ){
@@ -85,14 +62,20 @@ define( [
       } //if
     }; //remove
 
-    this.show = function( name, options ){
+    this.open = function( name, listeners ){
+      function onClose( e ){
+        dialog.unlisten( listeners );
+        dialog.unlisten( "close", onClose );
+      } //onClose
       var dialog = _dialogs[ name ];
-      if( dialog ){
-        dialog.show( options, _body );
+      if( dialog && dialog.canOpen ){
+        dialog.listen( listeners ); 
+        dialog.listen( "close", onClose );
+        _layerManager.add( dialog );
       } //if
     }; //show
 
-    this.hide = function( name ){
+    this.close = function( name ){
       var dialog = _dialogs[ name ];
       if( dialog ){
         dialog.hide();
@@ -153,6 +136,7 @@ define( [
     document.addEventListener( "DOMContentLoaded", function( e ){
       getDialogTemplates();
       getDialogContents();
+      _body = document.body;
     }, false );
     getDialogTemplates();
     getDialogContents();
