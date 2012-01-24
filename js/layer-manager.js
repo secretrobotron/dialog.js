@@ -18,7 +18,7 @@ define( [ "./util", "./event-manager" ] , function( util, EventManager ){
     util.css( _background, "left", "0px" );
 
     if( dialog.modal ){
-      util.css( _background, "background-color", "rgba( 0, 0, 0, 0.6 )" );
+      util.css( _background, "background", "rgba( 0, 0, 0, 0.6 )" );
       util.css( _background, "width", "100%" );
       util.css( _background, "height", "100%" );
       window.addEventListener( "resize", function( e ){
