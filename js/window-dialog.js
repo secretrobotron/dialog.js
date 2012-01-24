@@ -54,11 +54,11 @@ define( [ "./util", "./base-dialog", "./comm", "./event-manager" ], function( ut
       _currentComm.destroy();
       _baseDialog.close();
       _em.dispatch( "close" );
-      console.log( "closed!" );
       if( _currentWindow.close ){
         _currentWindow.close();
       } //if
       clearInterval( _windowStatusInterval );
+      _currentComm = _currentWindow = undefined;
     } //close
 
     function checkWindowStatus(){
@@ -84,6 +84,11 @@ define( [ "./util", "./base-dialog", "./comm", "./event-manager" ], function( ut
       close();
     }; //close
 
+    this.send = function( type, data ){
+      if( _currentComm ){
+        _currentComm.send( type, data );
+      } //if
+    }; //send
     
   }; //WindowDialog
 

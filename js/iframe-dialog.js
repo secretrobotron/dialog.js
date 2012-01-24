@@ -39,6 +39,7 @@ define( [ "./util", "./base-dialog", "./comm", "./event-manager" ], function( ut
       _currentTemplate.destroy();
       _baseDialog.close();
       _em.dispatch( "close" );
+      _currentComm = _currentTemplate = undefined;
     } //close
 
     this.open = function( background ){
@@ -65,6 +66,12 @@ define( [ "./util", "./base-dialog", "./comm", "./event-manager" ], function( ut
     this.close = function(){
       close();
     }; //close
+
+    this.send = function( type, data ){
+      if( _currentComm ){
+        _currentComm.send( type, data );
+      } //if
+    }; //send
     
   }; //IFRAMEDialog
 

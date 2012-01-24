@@ -82,6 +82,13 @@ define( [
       } //if
     }; //hide
 
+    this.send = function( name, type, data ){
+      var dialog = _dialogs[ name ];
+      if( dialog ){
+        dialog.send( type, data );
+      } //if
+    }; //send
+
     this.hideAll = function( name ){
       for( var d in _dialogs ){
         if( _dialogs.hasOwnProperty( d ) ){
